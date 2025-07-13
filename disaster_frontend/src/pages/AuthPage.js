@@ -1,7 +1,6 @@
-"use client"
-
 import { useState } from "react"
 import { useNavigate } from "react-router-dom"
+import axios from 'axios'
 
 const AuthPage = ({ darkMode, setIsAuthenticated, onLogin }) => {
   const [isLogin, setIsLogin] = useState(true)
@@ -20,7 +19,6 @@ const AuthPage = ({ darkMode, setIsAuthenticated, onLogin }) => {
       ...prev,
       [name]: value,
     }))
-    // Clear error when user starts typing
     if (errors[name]) {
       setErrors((prev) => ({
         ...prev,
@@ -32,9 +30,7 @@ const AuthPage = ({ darkMode, setIsAuthenticated, onLogin }) => {
   const validateForm = () => {
     const newErrors = {}
 
-    if (!formData.username.trim()) {
-      newErrors.username = "Username is required"
-    }
+    if (!formData.username.trim()) newErrors.username = "Username is required"
 
     if (!isLogin && !formData.email.trim()) {
       newErrors.email = "Email is required"
@@ -56,27 +52,42 @@ const AuthPage = ({ darkMode, setIsAuthenticated, onLogin }) => {
     return Object.keys(newErrors).length === 0
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (validateForm()) {
-      // Simulate authentication
-      const userData = {
-        username: formData.username,
-        email: formData.email || `${formData.username}@example.com`,
-        id: Math.random().toString(36).substr(2, 9),
-      }
+    if (!validateForm()) return
 
-      setIsAuthenticated(true)
-      onLogin(userData)
-      navigate("/dashboard")
+    try {
+      if (isLogin) {
+        // LOGIN
+        const res = await axios.post("http://127.0.0.1:8000/api/token/", {
+          username: formData.username,
+          password: formData.password,
+        })
+
+        const token = res.data.access
+        localStorage.setItem("token", token)
+        setIsAuthenticated(true)
+        onLogin({ username: formData.username })
+        navigate("/dashboard")
+      } else {
+        // SIGNUP
+        const res = await axios.post("http://127.0.0.1:8000/api/register/", {
+          username: formData.username,
+          email: formData.email,
+          password: formData.password,
+        })
+        alert("Account created successfully. Please log in.")
+        setIsLogin(true)
+      }
+    } catch (err) {
+      alert("Authentication failed. Please try again.")
+      console.error(err)
     }
   }
 
   const handleForgotPassword = () => {
     const email = prompt("Enter your email address:")
-    if (email) {
-      alert(`Password reset link sent to ${email}`)
-    }
+    if (email) alert(`Password reset link sent to ${email}`)
   }
 
   return (
@@ -86,13 +97,9 @@ const AuthPage = ({ darkMode, setIsAuthenticated, onLogin }) => {
           <div className="col-lg-10">
             <div className="card shadow-lg border-0 rounded-4 overflow-hidden animate-fade-in">
               <div className="row g-0">
-                {/* Left Side - Hero */}
                 <div
                   className="col-lg-6 d-flex align-items-center"
-                  style={{
-                    background: "linear-gradient(135deg, #DC2626 0%, #2563EB 100%)",
-                    color: "white",
-                  }}
+                  style={{ background: "linear-gradient(135deg, #DC2626 0%, #2563EB 100%)", color: "white" }}
                 >
                   <div className="p-5 text-center">
                     <h1 className="display-4 fw-bold mb-4 animate-slide-in-left">Welcome to DisasterWatch</h1>
@@ -116,10 +123,8 @@ const AuthPage = ({ darkMode, setIsAuthenticated, onLogin }) => {
                   </div>
                 </div>
 
-                {/* Right Side - Forms */}
                 <div className={`col-lg-6 ${darkMode ? "bg-dark text-light" : "bg-white"}`}>
                   <div className="p-5">
-                    {/* Toggle Buttons */}
                     <div className="d-flex mb-4">
                       <button
                         className={`btn flex-fill me-2 ${isLogin ? "btn-primary" : "btn-outline-primary"}`}
@@ -138,7 +143,6 @@ const AuthPage = ({ darkMode, setIsAuthenticated, onLogin }) => {
                     <form onSubmit={handleSubmit} className="animate-fade-in">
                       <h3 className="mb-4 text-center">{isLogin ? "🔐 Welcome Back!" : "🚀 Join DisasterWatch"}</h3>
 
-                      {/* Username */}
                       <div className="mb-3">
                         <label htmlFor="username" className="form-label">
                           Username {isLogin ? "or Email" : ""}
@@ -155,12 +159,9 @@ const AuthPage = ({ darkMode, setIsAuthenticated, onLogin }) => {
                         {errors.username && <div className="invalid-feedback">{errors.username}</div>}
                       </div>
 
-                      {/* Email (Sign up only) */}
                       {!isLogin && (
                         <div className="mb-3">
-                          <label htmlFor="email" className="form-label">
-                            Email
-                          </label>
+                          <label htmlFor="email" className="form-label">Email</label>
                           <input
                             type="email"
                             className={`form-control ${errors.email ? "is-invalid" : ""}`}
@@ -174,11 +175,8 @@ const AuthPage = ({ darkMode, setIsAuthenticated, onLogin }) => {
                         </div>
                       )}
 
-                      {/* Password */}
                       <div className="mb-3">
-                        <label htmlFor="password" className="form-label">
-                          Password
-                        </label>
+                        <label htmlFor="password" className="form-label">Password</label>
                         <input
                           type="password"
                           className={`form-control ${errors.password ? "is-invalid" : ""}`}
@@ -191,12 +189,9 @@ const AuthPage = ({ darkMode, setIsAuthenticated, onLogin }) => {
                         {errors.password && <div className="invalid-feedback">{errors.password}</div>}
                       </div>
 
-                      {/* Confirm Password (Sign up only) */}
                       {!isLogin && (
                         <div className="mb-3">
-                          <label htmlFor="confirmPassword" className="form-label">
-                            Confirm Password
-                          </label>
+                          <label htmlFor="confirmPassword" className="form-label">Confirm Password</label>
                           <input
                             type="password"
                             className={`form-control ${errors.confirmPassword ? "is-invalid" : ""}`}
@@ -210,12 +205,10 @@ const AuthPage = ({ darkMode, setIsAuthenticated, onLogin }) => {
                         </div>
                       )}
 
-                      {/* Submit Button */}
                       <button type="submit" className="btn btn-primary w-100 btn-lg btn-animated mb-3">
                         {isLogin ? "🔓 Login" : "🚀 Create Account"}
                       </button>
 
-                      {/* Additional Links */}
                       <div className="text-center">
                         {isLogin ? (
                           <p className="mb-0">
@@ -229,21 +222,22 @@ const AuthPage = ({ darkMode, setIsAuthenticated, onLogin }) => {
                           </p>
                         ) : (
                           <p className="mb-0 small text-muted">
-                            By signing up, you agree to our{" "}
+                            By signing up, you agree to our {" "}
                             <button
                               type="button"
                               className="btn btn-link text-decoration-none p-0 small"
                               onClick={() => navigate("/privacy")}
                             >
                               Terms of Service and Privacy Policy
-                            </button>
-                            .
+                            </button>.
                           </p>
                         )}
                       </div>
                     </form>
+
                   </div>
                 </div>
+
               </div>
             </div>
           </div>

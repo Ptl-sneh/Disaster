@@ -1,11 +1,30 @@
 from django.urls import path
-from .views import register_user, report_disaster, ListDisastersView
+from .views import (
+    register_user,
+    report_disaster,
+    ListDisastersView,
+    register_volunteer,
+    list_shelters,
+    list_volunteers,
+    list_disasters,
+)
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
+    # Auth
     path('register/', register_user, name='register'),
     path('token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
     path('token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+
+    # Disasters
     path('disasters/report/', report_disaster, name='report_disaster'),
     path('disasters/', ListDisastersView.as_view(), name='list_disasters'),
+    path('disasters/list/', list_disasters, name='filtered_disasters'),
+
+    # Volunteers
+    path('volunteer/register/', register_volunteer, name='register_volunteer'),
+    path('volunteers/', list_volunteers, name='list_volunteers'),
+
+    # Shelters
+    path('shelters/', list_shelters, name='list_shelters'),
 ]

@@ -11,6 +11,7 @@ DISASTER_TYPES = [
 
 class Disaster(models.Model):
     type = models.CharField(max_length=20, choices=DISASTER_TYPES)
+    severity_level = models.CharField(max_length=100, default='Moderate')  # optional
     description = models.TextField()
     latitude = models.FloatField()
     longitude = models.FloatField()
@@ -35,14 +36,21 @@ class Shelter(models.Model):
         return self.name
 
 
-
 class Volunteer(models.Model):
-    user = models.OneToOneField(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    name = models.CharField(max_length=100)
+    role = models.CharField(max_length=100)
+    specialization = models.CharField(max_length=200, blank=True)
+    contact = models.EmailField()  # This corresponds to contact in formData
     phone = models.CharField(max_length=15)
-    skills = models.CharField(max_length=100, blank=True, null=True)
-    latitude = models.FloatField(blank=True, null=True)
-    longitude = models.FloatField(blank=True, null=True)
-    registered_at = models.DateTimeField(default=timezone.now)
+    contact = models.EmailField()
+    availability = models.CharField(max_length=50)
+    location = models.CharField(max_length=200)
+    experience = models.TextField(blank=True)
+    certifications = models.JSONField(blank=True, default=list)  # Assuming PostgreSQL or recent Django
+    languages = models.JSONField(blank=True, default=list)       # Same here
+    registered_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
-        return self.user.username
+        return self.name
+

@@ -30,7 +30,10 @@ class ShelterSerializer(serializers.ModelSerializer):
         fields = '__all__'
 
 class VolunteerSerializer(serializers.ModelSerializer):
+    email = serializers.EmailField(source='user.email', read_only=True)
+
     class Meta:
         model = Volunteer
         fields = '__all__'
+        read_only_fields = ['user', 'email', 'registered_at']
 

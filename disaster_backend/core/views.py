@@ -42,15 +42,14 @@ def list_shelters(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def register_volunteer(request):
-    # Attach the logged-in user to the volunteer
     data = request.data.copy()
     data['user'] = request.user.id
-
     serializer = VolunteerSerializer(data=data)
     if serializer.is_valid():
         serializer.save()
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])  # You can change to IsAuthenticated if you want to protect it
