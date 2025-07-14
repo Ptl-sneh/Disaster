@@ -7,6 +7,7 @@ from .views import (
     list_shelters,
     list_volunteers,
     list_disasters,
+    submit_contact_message,
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -27,4 +28,6 @@ urlpatterns = [
 
     # Shelters
     path('shelters/', list_shelters, name='list_shelters'),
+    
+    path('contact/', submit_contact_message, name='submit-contact'),
 ]

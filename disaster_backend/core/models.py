@@ -37,20 +37,38 @@ class Shelter(models.Model):
 
 
 class Volunteer(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)
     name = models.CharField(max_length=100)
     role = models.CharField(max_length=100)
     specialization = models.CharField(max_length=200, blank=True)
-    contact = models.EmailField()  # This corresponds to contact in formData
+    contact = models.EmailField()  # ✅ Only one contact field now
     phone = models.CharField(max_length=15)
-    contact = models.EmailField()
     availability = models.CharField(max_length=50)
     location = models.CharField(max_length=200)
     experience = models.TextField(blank=True)
-    certifications = models.JSONField(blank=True, default=list)  # Assuming PostgreSQL or recent Django
-    languages = models.JSONField(blank=True, default=list)       # Same here
+    certifications = models.JSONField(blank=True, default=list)
+    languages = models.JSONField(blank=True, default=list)
     registered_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
+
+class ContactMessage(models.Model):
+    URGENCY_LEVELS = [
+        ('low', 'Low - General inquiry'),
+        ('normal', 'Normal - Standard support'),
+        ('high', 'High - Urgent issue'),
+        ('critical', 'Critical - Emergency'),
+    ]
+
+    name = models.CharField(max_length=100)
+    email = models.EmailField()
+    subject = models.CharField(max_length=200)
+    message = models.TextField()
+    urgency = models.CharField(max_length=10, choices=URGENCY_LEVELS, default='normal')
+    submitted_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.name} - {self.subject} ({self.urgency})"
+
 

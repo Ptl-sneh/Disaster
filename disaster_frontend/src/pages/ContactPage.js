@@ -1,6 +1,8 @@
+/* eslint-disable jsx-a11y/anchor-is-valid */
 "use client"
 
 import { useState } from "react"
+import axios from "axios"
 
 const ContactPage = ({ darkMode }) => {
   const [formData, setFormData] = useState({
@@ -58,20 +60,15 @@ const ContactPage = ({ darkMode }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault()
-
-    if (!validateForm()) {
-      return
-    }
-
+  
+    if (!validateForm()) return
+  
     setIsSubmitting(true)
-
+  
     try {
-      // Simulate API call
-      await new Promise((resolve) => setTimeout(resolve, 2000))
-
-      // Show success message
+      await axios.post("http://127.0.0.1:8000/api/contact/", formData)
       alert("Message sent successfully! We'll get back to you within 24 hours.")
-
+  
       // Reset form
       setFormData({
         name: "",
@@ -81,6 +78,7 @@ const ContactPage = ({ darkMode }) => {
         urgency: "normal",
       })
     } catch (error) {
+      console.error(error.response?.data || error.message)
       alert("Error sending message. Please try again.")
     } finally {
       setIsSubmitting(false)

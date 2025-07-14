@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Disaster,Shelter,Volunteer
+from .models import Disaster,Shelter,Volunteer,ContactMessage
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -36,4 +36,10 @@ class VolunteerSerializer(serializers.ModelSerializer):
         model = Volunteer
         fields = '__all__'
         read_only_fields = ['user', 'email', 'registered_at']
+
+class ContactMessageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ContactMessage
+        fields = '__all__'
+        read_only_fields = ['submitted_at']
 

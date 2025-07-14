@@ -75,7 +75,7 @@ const PricingPage = ({ darkMode }) => {
     {
       name: "Advanced Analytics",
       price: 15,
-      description: "Detailed reporting and predictive insights",
+      description: "Detailed reporting",
     },
     {
       name: "SMS Notifications",
