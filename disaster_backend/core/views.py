@@ -2,8 +2,8 @@ from rest_framework import status,generics
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
-from .serializers import UserRegisterSerializer,ShelterSerializer,VolunteerSerializer,DisasterSerializer
-from .models import Disaster,Shelter,Volunteer
+from .serializers import UserRegisterSerializer,ShelterSerializer,VolunteerSerializer,DisasterSerializer,ContactMessageSerializer
+from .models import Disaster,Shelter,Volunteer,ContactMessage
 
 
 @api_view(['POST'])
@@ -39,17 +39,30 @@ def list_shelters(request):
     serializer = ShelterSerializer(shelters, many=True)
     return Response(serializer.data)
 
+# @api_view(['POST'])
+# @permission_classes([IsAuthenticated])
+# def register_volunteer(request):
+#     data = request.data.copy()
+#     data['user'] = request.user.id
+#     serializer = VolunteerSerializer(data=data)
+#     if serializer.is_valid():
+#         serializer.save()
+#         return Response(serializer.data, status=status.HTTP_201_CREATED)
+#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def register_volunteer(request):
+    user = request.user
     data = request.data.copy()
-    data['user'] = request.user.id
+
     serializer = VolunteerSerializer(data=data)
     if serializer.is_valid():
-        serializer.save()
+        serializer.save(user=user)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])  # You can change to IsAuthenticated if you want to protect it
@@ -84,3 +97,11 @@ def list_disasters(request):
     return Response(serializer.data)
 
 
+
+@api_view(['POST'])
+def submit_contact_message(request):
+    serializer = ContactMessageSerializer(data=request.data)
+    if serializer.is_valid():
+        serializer.save()
+        return Response({"message": "Message submitted successfully"}, status=status.HTTP_201_CREATED)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
