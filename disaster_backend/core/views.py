@@ -7,21 +7,15 @@ from .models import Disaster,Shelter,Volunteer,ContactMessage
 import requests
 
 def geocode_address(address):
-    access_key = 'a50bd7285594cc83638a191a28df04bd'
-    url = "http://api.positionstack.com/v1/forward"
-    params = {
-        'access_key': access_key,
-        'query': address,
-        'limit': 1
-    }
-    response = requests.get(url, params=params)
-    data = response.json()
-    
-    if data.get('data'):
-        return data['data'][0]['latitude'], data['data'][0]['longitude']
+    key = 'ee92ecdd73ea4e38b10bd8553e5f0856'
+    url = f"https://api.opencagedata.com/geocode/v1/json"
+    params = {'q': address, 'key': key}
+    r = requests.get(url, params=params)
+    results = r.json()
+    if results['results']:
+        latlng = results['results'][0]['geometry']
+        return latlng['lat'], latlng['lng']
     return None, None
-
-
 
 
 @api_view(['POST'])
