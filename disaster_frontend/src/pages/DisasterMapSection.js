@@ -29,7 +29,7 @@ const DisasterMapSection = () => {
   }, []);
 
   return (
-    <div className="col-lg-12" style={{ height: "650px",marginBottom:'125px' }}>
+    <div className="col-lg-12" style={{ height: "650px", marginBottom: '125px' }}>
       <div className="card border-0 shadow-lg animate-slide-in-right">
         <div className="card-body">
           <div className="rounded-3 mb-3">
@@ -47,25 +47,34 @@ const DisasterMapSection = () => {
                 attribution='&copy; OpenStreetMap contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
-              {disasters.map((disaster) => (
-                <Marker
-                  key={disaster.id}
-                  position={[
-                    parseFloat(disaster.latitude),
-                    parseFloat(disaster.longitude),
-                  ]}
-                >
-                  <Popup>
-                    <strong>{disaster.type}</strong>
-                    <br />
-                    {disaster.location}
-                    <br />
-                    Status: {disaster.description}
-                    <br />
-                    Time: {disaster.timestamp}
-                  </Popup>
-                </Marker>
-              ))}
+              {disasters
+                .filter(
+                  (disaster) =>
+                    disaster.latitude !== null &&
+                    disaster.longitude !== null &&
+                    !isNaN(parseFloat(disaster.latitude)) &&
+                    !isNaN(parseFloat(disaster.longitude))
+                )
+                .map((disaster) => (
+                  <Marker
+                    key={disaster.id}
+                    position={[
+                      parseFloat(disaster.latitude),
+                      parseFloat(disaster.longitude),
+                    ]}
+                  >
+                    <Popup>
+                      <strong>{disaster.type}</strong>
+                      <br />
+                      {disaster.location}
+                      <br />
+                      Status: {disaster.description}
+                      <br />
+                      Time: {disaster.timestamp}
+                    </Popup>
+                  </Marker>
+                ))}
+
             </MapContainer>
           </div>
         </div>
