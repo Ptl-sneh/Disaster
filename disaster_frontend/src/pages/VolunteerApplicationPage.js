@@ -145,9 +145,13 @@ const VolunteerApplicationPage = ({ darkMode, user }) => {
             >
               <option value="">Select role</option>
               <option value="Communications">Communications</option>
-              <option value="Medical">Medical</option>
-              <option value="Logistics">Logistics</option>
               <option value="Search & Rescue">Search & Rescue</option>
+              <option value="Medical Professional">Medical Professional</option>
+              <option value="Mental Health Support">Mental Health Support</option>
+              <option value="Transportation">Transportation</option>
+              <option value="Shelter Management">Shelter Management</option>
+              <option value="Technical Support">Technical Support</option>
+              <option value="Logistics">Logistics</option>
             </select>
             {errors.role && <div className="invalid-feedback">{errors.role}</div>}
           </div>

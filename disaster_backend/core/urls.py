@@ -1,4 +1,5 @@
-from django.urls import path
+from django.urls import path,include
+from .views import VolunteerListView
 from .views import (
     register_user,
     report_disaster,
@@ -24,7 +25,8 @@ urlpatterns = [
 
     # Volunteers
     path('volunteer/register/', register_volunteer, name='register_volunteer'),
-    path('volunteers/', list_volunteers, name='list_volunteers'),
+    path('volunteers/', VolunteerListView.as_view(), name='volunteer-list'),
+    # path('volunteers/', list_volunteers, name='list_volunteers'),
 
     # Shelters
     path('shelters/', list_shelters, name='list_shelters'),

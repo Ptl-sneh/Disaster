@@ -1,178 +1,91 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
+import axios from "axios"                // ⬅️ NEW
 
 const VolunteersPage = ({ darkMode }) => {
+  /* ──────────────────────────────────────────────────────────
+     1️⃣ State
+  ────────────────────────────────────────────────────────── */
+  const [volunteers, setVolunteers] = useState([])    // ⬅️ now starts empty
   const [searchTerm, setSearchTerm] = useState("")
   const [filterRole, setFilterRole] = useState("all")
   const [filterAvailability, setFilterAvailability] = useState("all")
   const navigate = useNavigate()
 
-  const [volunteers] = useState([
-    {
-      id: 1,
-      name: "Dr. Sarah Johnson",
-      role: "Medical Professional",
-      specialization: "Emergency Medicine",
-      contact: "sarah.j@email.com",
-      phone: "(555) 123-4567",
-      availability: "available",
-      location: "Downtown Medical Center",
-      experience: "15 years",
-      certifications: ["EMT", "CPR", "First Aid"],
-      languages: ["English", "Spanish"],
-      avatar: "👩‍⚕️",
-    },
-    {
-      id: 2,
-      name: "Mike Rodriguez",
-      role: "Search & Rescue",
-      specialization: "Urban Search and Rescue",
-      contact: "mike.r@email.com",
-      phone: "(555) 987-6543",
-      availability: "busy",
-      location: "Fire Station 12",
-      experience: "8 years",
-      certifications: ["USAR", "Rope Rescue", "Confined Space"],
-      languages: ["English", "Spanish"],
-      avatar: "👨‍🚒",
-    },
-    {
-      id: 3,
-      name: "Lisa Chen",
-      role: "Communications",
-      specialization: "Emergency Communications",
-      contact: "lisa.c@email.com",
-      phone: "(555) 456-7890",
-      availability: "available",
-      location: "Emergency Operations Center",
-      experience: "5 years",
-      certifications: ["Ham Radio", "FEMA ICS"],
-      languages: ["English", "Mandarin"],
-      avatar: "👩‍💻",
-    },
-    {
-      id: 4,
-      name: "James Wilson",
-      role: "Logistics Coordinator",
-      specialization: "Supply Chain Management",
-      contact: "james.w@email.com",
-      phone: "(555) 234-5678",
-      availability: "available",
-      location: "Distribution Center",
-      experience: "12 years",
-      certifications: ["Supply Chain", "Warehouse Management"],
-      languages: ["English"],
-      avatar: "👨‍💼",
-    },
-    {
-      id: 5,
-      name: "Maria Garcia",
-      role: "Mental Health Support",
-      specialization: "Crisis Counseling",
-      contact: "maria.g@email.com",
-      phone: "(555) 345-6789",
-      availability: "offline",
-      location: "Community Health Center",
-      experience: "10 years",
-      certifications: ["Licensed Counselor", "Crisis Intervention"],
-      languages: ["English", "Spanish", "Portuguese"],
-      avatar: "👩‍🎓",
-    },
-    {
-      id: 6,
-      name: "David Kim",
-      role: "Transportation",
-      specialization: "Emergency Transport",
-      contact: "david.k@email.com",
-      phone: "(555) 567-8901",
-      availability: "available",
-      location: "Transport Hub",
-      experience: "6 years",
-      certifications: ["CDL", "Defensive Driving", "First Aid"],
-      languages: ["English", "Korean"],
-      avatar: "👨‍✈️",
-    },
-    {
-      id: 7,
-      name: "Emily Brown",
-      role: "Shelter Management",
-      specialization: "Emergency Shelter Operations",
-      contact: "emily.b@email.com",
-      phone: "(555) 678-9012",
-      availability: "busy",
-      location: "Community Center",
-      experience: "7 years",
-      certifications: ["Shelter Management", "Food Safety"],
-      languages: ["English", "French"],
-      avatar: "👩‍🏫",
-    },
-    {
-      id: 8,
-      name: "Robert Taylor",
-      role: "Technical Support",
-      specialization: "IT & Communications",
-      contact: "robert.t@email.com",
-      phone: "(555) 789-0123",
-      availability: "available",
-      location: "Tech Operations Center",
-      experience: "9 years",
-      certifications: ["Network+", "Security+", "ITIL"],
-      languages: ["English"],
-      avatar: "👨‍💻",
-    },
-  ])
+  /* ──────────────────────────────────────────────────────────
+     2️⃣ Fetch volunteers from Django API (once, on mount)
+  ────────────────────────────────────────────────────────── */
+  useEffect(() => {
+    axios
+      .get("http://127.0.0.1:8000/api/volunteers/")
+      .then((res) => setVolunteers(res.data))
+      .catch((err) => console.error("Error fetching volunteers:", err))
+  }, [])
 
+  /* ──────────────────────────────────────────────────────────
+     3️⃣ Static list of roles for the filter dropdown
+         (keep this unless you want to build it dynamically)
+  ────────────────────────────────────────────────────────── */
   const roles = [
     "Medical Professional",
     "Search & Rescue",
     "Communications",
-    "Logistics Coordinator",
+    "Logistics",
     "Mental Health Support",
     "Transportation",
     "Shelter Management",
     "Technical Support",
   ]
 
+  /* ──────────────────────────────────────────────────────────
+     4️⃣ Derived helpers (unchanged)
+  ────────────────────────────────────────────────────────── */
   const filteredVolunteers = volunteers.filter((volunteer) => {
     const matchesSearch =
       volunteer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       volunteer.role.toLowerCase().includes(searchTerm.toLowerCase()) ||
       volunteer.specialization.toLowerCase().includes(searchTerm.toLowerCase())
     const matchesRole = filterRole === "all" || volunteer.role === filterRole
-    const matchesAvailability = filterAvailability === "all" || volunteer.availability === filterAvailability
+    const matchesAvailability =
+      filterAvailability === "all" || volunteer.availability === filterAvailability
     return matchesSearch && matchesRole && matchesAvailability
   })
 
   const getAvailabilityBadge = (availability) => {
-    switch (availability) {
-      case "available":
-        return { class: "badge-available", text: "🟢 Available", icon: "✅" }
-      case "busy":
-        return { class: "badge-busy", text: "🟡 Busy", icon: "⏳" }
-      case "offline":
-        return { class: "badge-offline", text: "🔴 Offline", icon: "❌" }
-      default:
-        return { class: "badge-offline", text: "❓ Unknown", icon: "❓" }
-    }
-  }
+  const value = availability?.toLowerCase();
 
-  const getAvailabilityStats = () => {
-    const available = volunteers.filter((v) => v.availability === "available").length
-    const busy = volunteers.filter((v) => v.availability === "busy").length
-    const offline = volunteers.filter((v) => v.availability === "offline").length
-    return { available, busy, offline }
+  switch (value) {
+    case "available":
+      return { text: "Available", class: "bg-success" };
+    case "on-call":
+      return { text: "On Call", class: "bg-warning text-dark" };
+    case "unavailable":
+      return { text: "Unavailable", class: "bg-danger" };
+    default:
+      return { text: "Unknown", class: "bg-secondary" };
   }
+};
+
+
+ const getAvailabilityStats = () => {
+  const available = volunteers.filter((v) => v.availability === "available").length;
+  const onCall = volunteers.filter((v) => v.availability === "on-call").length;
+  const unavailable = volunteers.filter((v) => v.availability === "unavailable").length;
+  return { available, onCall, unavailable };
+};
+
 
   const handleContactVolunteer = (volunteer) => {
     if (volunteer.availability === "offline") {
       alert("This volunteer is currently offline and cannot be contacted.")
       return
     }
-
     const message = `Hello ${volunteer.name}, I found your profile on DisasterWatch and would like to connect regarding emergency response coordination.`
-    window.location.href = `mailto:${volunteer.contact}?subject=DisasterWatch Contact Request&body=${encodeURIComponent(message)}`
+    window.location.href = `mailto:${volunteer.contact}?subject=DisasterWatch Contact Request&body=${encodeURIComponent(
+      message,
+    )}`
   }
 
   const handleCallVolunteer = (volunteer) => {
@@ -180,7 +93,6 @@ const VolunteersPage = ({ darkMode }) => {
       alert("This volunteer is currently offline and cannot be contacted.")
       return
     }
-
     window.location.href = `tel:${volunteer.phone}`
   }
 
@@ -192,6 +104,9 @@ const VolunteersPage = ({ darkMode }) => {
 
   const stats = getAvailabilityStats()
 
+  /* ──────────────────────────────────────────────────────────
+     5️⃣ JSX (identical to your original)
+  ────────────────────────────────────────────────────────── */
   return (
     <div className={`volunteers-page py-4 ${darkMode ? "bg-dark text-light" : "bg-light"}`}>
       <div className="container">
@@ -216,25 +131,25 @@ const VolunteersPage = ({ darkMode }) => {
           </div>
           <div className="col-md-4 mb-3">
             <div className="card card-hover border-0 shadow-lg">
-              <div className="card-body text-center p-4">
-                <div className="display-4 mb-2">⏳</div>
-                <h3 className="text-warning">{stats.busy}</h3>
-                <h6 className="text-muted">Currently Busy</h6>
-              </div>
-            </div>
+    <div className="card-body text-center p-4">
+      <div className="display-4 mb-2">⏳</div>
+      <h3 className="text-warning">{stats.onCall}</h3>
+      <h6 className="text-muted">On Call</h6>
+    </div>
+  </div>
           </div>
           <div className="col-md-4 mb-3">
             <div className="card card-hover border-0 shadow-lg">
-              <div className="card-body text-center p-4">
-                <div className="display-4 mb-2">👥</div>
-                <h3 className="text-primary">{volunteers.length}</h3>
-                <h6 className="text-muted">Total Volunteers</h6>
-              </div>
-            </div>
+    <div className="card-body text-center p-4">
+      <div className="display-4 mb-2">🚫</div>
+      <h3 className="text-danger">{stats.unavailable}</h3>
+      <h6 className="text-muted">Unavailable</h6>
+    </div>
+  </div>
           </div>
         </div>
 
-        {/* Search and Filter */}
+        {/* Search & Filters */}
         <div className="card border-0 shadow-lg mb-4 animate-slide-in-left">
           <div className="card-body p-4">
             <div className="row">
@@ -268,8 +183,9 @@ const VolunteersPage = ({ darkMode }) => {
                 >
                   <option value="all">All Status</option>
                   <option value="available">Available</option>
-                  <option value="busy">Busy</option>
-                  <option value="offline">Offline</option>
+                  <option value="on-call">On Call</option>
+<option value="unavailable">Unavailable</option>
+
                 </select>
               </div>
             </div>
@@ -361,14 +277,14 @@ const VolunteersPage = ({ darkMode }) => {
                   <div className="d-grid gap-2 d-md-flex">
                     <button
                       className="btn btn-primary btn-sm flex-fill"
-                      disabled={volunteer.availability === "offline"}
+                      disabled={volunteer.availability === "unavailable"}
                       onClick={() => handleContactVolunteer(volunteer)}
                     >
                       📧 Contact
                     </button>
                     <button
                       className="btn btn-outline-primary btn-sm flex-fill"
-                      disabled={volunteer.availability === "offline"}
+                      disabled={volunteer.availability === "unavailable"}
                       onClick={() => handleCallVolunteer(volunteer)}
                     >
                       📞 Call

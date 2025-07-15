@@ -99,6 +99,7 @@ def register_volunteer(request):
 def list_volunteers(request):
     volunteers = Volunteer.objects.all()
     serializer = VolunteerSerializer(volunteers, many=True)
+    permission_classes = [AllowAny]  # ✅ This makes it public
     return Response(serializer.data)
 
 
@@ -135,3 +136,12 @@ def submit_contact_message(request):
         serializer.save()
         return Response({"message": "Message submitted successfully"}, status=status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+class VolunteerListView(generics.ListAPIView):
+    queryset = Volunteer.objects.all()
+    serializer_class = VolunteerSerializer
+    permission_classes = [AllowAny]
+
+    def get(self, request, *args, **kwargs):
+        print("🔥 Volunteers fetched:", Volunteer.objects.all())
+        return super().get(request, *args, **kwargs)
