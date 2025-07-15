@@ -34,9 +34,8 @@ const LandingPage = ({ darkMode, toggleTheme, isAuthenticated }) => {
     <div className="landing-page">
       {/* Navigation */}
       <nav
-        className={`navbar navbar-expand-lg fixed-top ${
-          darkMode ? "navbar-dark" : "navbar-light"
-        }`}
+        className={`navbar navbar-expand-lg fixed-top ${darkMode ? "navbar-dark" : "navbar-light"
+          }`}
         style={{ backgroundColor: "transparent" }}
       >
         <div className="container">
@@ -297,7 +296,7 @@ const LandingPage = ({ darkMode, toggleTheme, isAuthenticated }) => {
         </div>
       </section>
 
-     
+
 
       {/* Call to Action */}
       <section
@@ -335,9 +334,8 @@ const LandingPage = ({ darkMode, toggleTheme, isAuthenticated }) => {
 
       {/* Footer */}
       <footer
-        className={`py-5 ${
-          darkMode ? "bg-dark text-light" : "bg-light text-dark"
-        }`}
+        className={`py-5 ${darkMode ? "bg-dark text-light" : "bg-light text-dark"
+          }`}
       >
         <div className="container">
           <div className="row">
