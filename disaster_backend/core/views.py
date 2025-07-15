@@ -4,6 +4,24 @@ from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
 from .serializers import UserRegisterSerializer,ShelterSerializer,VolunteerSerializer,DisasterSerializer,ContactMessageSerializer
 from .models import Disaster,Shelter,Volunteer,ContactMessage
+import requests
+
+def geocode_address(address):
+    access_key = 'a50bd7285594cc83638a191a28df04bd'
+    url = "http://api.positionstack.com/v1/forward"
+    params = {
+        'access_key': access_key,
+        'query': address,
+        'limit': 1
+    }
+    response = requests.get(url, params=params)
+    data = response.json()
+    
+    if data.get('data'):
+        return data['data'][0]['latitude'], data['data'][0]['longitude']
+    return None, None
+
+
 
 
 @api_view(['POST'])
@@ -19,14 +37,26 @@ def register_user(request):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def report_disaster(request):
-    serializer = DisasterSerializer(data=request.data)
+    address = request.data.get('address')
+    print("📮 Received address from frontend:", address)
+
+    lat, lon = geocode_address(address)
+    print("📍 Geocoded lat/lon:", lat, lon)
+
+    if not lat or not lon:
+        return Response({"error": "Could not locate address."}, status=400)
+
+    data = request.data.copy()
+    data['latitude'] = lat
+    data['longitude'] = lon
+
+    serializer = DisasterSerializer(data=data)
     if serializer.is_valid():
-        # Save with reported_by as the logged-in user
         serializer.save(reported_by=request.user)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
-    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
+        return Response(serializer.data, status=201)
+    else:
+        print("❌ Serializer errors:", serializer.errors)
+    return Response(serializer.errors, status=400)
 
 class ListDisastersView(generics.ListAPIView):
     queryset = Disaster.objects.filter(is_verified=True).order_by('-timestamp')
