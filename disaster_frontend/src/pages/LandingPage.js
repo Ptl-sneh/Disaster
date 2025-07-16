@@ -72,8 +72,8 @@ const LandingPage = ({ isAuthenticated }) => {
         {/* Main Hero Content */}
         <div className="container position-relative" style={{ zIndex: 2 }}>
           <div className="row align-items-center min-vh-100">
-            <div className="col-lg-6 text-white mx-auto text-center">
-              <h1 className="display-2 fw-bold mb-4">Act Fast. Save Lives.</h1>
+            <div className="col-lg-9 text-white mx-auto text-center">
+              <h1 className="display-2 fw-bold mb-1">Act Fast. Save Lives.</h1>
               <p className="lead mb-4 fs-4">
                 Real-time disaster reporting & volunteer coordination platform.
                 Connect communities, coordinate response, and save lives

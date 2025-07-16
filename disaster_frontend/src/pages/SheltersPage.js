@@ -1,84 +1,37 @@
 "use client"
 
-import { useState } from "react"
+import { useState,useEffect } from "react"
+import axios from "axios"
+import ShelterMapSection from "./ShelterMapSection"
 
 const SheltersPage = ({ darkMode }) => {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterType, setFilterType] = useState("all")
-  const [shelters] = useState([
-    {
-      id: 1,
-      name: "Community Center Shelter",
-      location: "123 Main Street, Downtown",
-      capacity: 150,
-      currentOccupancy: 87,
-      contact: "(555) 123-4567",
-      verified: true,
-      amenities: ["Food", "Medical", "Pet-Friendly", "WiFi"],
-      type: "community",
-      coordinates: { lat: 40.7128, lng: -74.006 },
-    },
-    {
-      id: 2,
-      name: "Red Cross Emergency Shelter",
-      location: "456 Oak Avenue, Midtown",
-      capacity: 200,
-      currentOccupancy: 134,
-      contact: "(555) 987-6543",
-      verified: true,
-      amenities: ["Food", "Medical", "Clothing", "Counseling"],
-      type: "emergency",
-      coordinates: { lat: 40.7589, lng: -73.9851 },
-    },
-    {
-      id: 3,
-      name: "School Gymnasium Shelter",
-      location: "789 Pine Road, Eastside",
-      capacity: 100,
-      currentOccupancy: 45,
-      contact: "(555) 456-7890",
-      verified: true,
-      amenities: ["Food", "Restrooms", "Parking"],
-      type: "school",
-      coordinates: { lat: 40.7505, lng: -73.9934 },
-    },
-    {
-      id: 4,
-      name: "Faith Community Shelter",
-      location: "321 Church Street, Westside",
-      capacity: 80,
-      currentOccupancy: 23,
-      contact: "(555) 234-5678",
-      verified: true,
-      amenities: ["Food", "Clothing", "Spiritual Care"],
-      type: "religious",
-      coordinates: { lat: 40.7282, lng: -74.0776 },
-    },
-    {
-      id: 5,
-      name: "Sports Complex Shelter",
-      location: "654 Stadium Drive, Northside",
-      capacity: 300,
-      currentOccupancy: 178,
-      contact: "(555) 345-6789",
-      verified: false,
-      amenities: ["Food", "Showers", "Large Space", "Parking"],
-      type: "sports",
-      coordinates: { lat: 40.7831, lng: -73.9712 },
-    },
-    {
-      id: 6,
-      name: "Hotel Emergency Housing",
-      location: "987 Business Blvd, Financial District",
-      capacity: 120,
-      currentOccupancy: 67,
-      contact: "(555) 567-8901",
-      verified: true,
-      amenities: ["Private Rooms", "Food", "WiFi", "Laundry"],
-      type: "hotel",
-      coordinates: { lat: 40.7074, lng: -74.0113 },
-    },
-  ])
+  const [shelters, setShelters] = useState([])
+
+useEffect(() => {
+  axios.get("http://127.0.0.1:8000/api/shelters/")
+    .then((res) => {
+      const transformed = res.data.map((shelter) => ({
+        ...shelter,
+        location: shelter.location || "Unknown location",
+        currentOccupancy: shelter.current_occupancy || 0,
+        contact: shelter.contact || "(N/A)",
+        verified: shelter.verified || false,
+        amenities: shelter.amenities || [],
+        type: shelter.shelter_type,
+        coordinates: {
+          lat: shelter.latitude,
+          lng: shelter.longitude,
+        }
+      }))
+      setShelters(transformed)
+    })
+    .catch((err) => {
+      console.error("Error fetching shelters:", err)
+    })
+}, [])
+
 
   const filteredShelters = shelters.filter((shelter) => {
     const matchesSearch =
@@ -87,8 +40,9 @@ const SheltersPage = ({ darkMode }) => {
     const matchesFilter =
       filterType === "all" ||
       (filterType === "verified" && shelter.verified) ||
-      (filterType === "available" && shelter.currentOccupancy < shelter.capacity) ||
+      (filterType === "available" && shelter.current_occupancy < shelter.capacity) ||
       shelter.type === filterType
+    console.log(shelter.type + filterType)
     return matchesSearch && matchesFilter
   })
 
@@ -115,18 +69,7 @@ const SheltersPage = ({ darkMode }) => {
         </div>
 
         {/* Map Section */}
-        <div className="card border-0 shadow-lg mb-4 animate-fade-in-up">
-          <div className="card-body p-4">
-            <div className="map-container rounded-3 mb-3" style={{ height: "300px" }}>
-              <div className="text-center">
-                <div className="display-1 mb-3">🗺️</div>
-                <h4>Interactive Shelter Map</h4>
-                <p className="text-muted">View all shelter locations with real-time availability status</p>
-                <button className="btn btn-primary">📍 View Full Map</button>
-              </div>
-            </div>
-          </div>
-        </div>
+        <ShelterMapSection/>
 
         {/* Search and Filter */}
         <div className="card border-0 shadow-lg mb-4 animate-slide-in-left">
@@ -185,9 +128,9 @@ const SheltersPage = ({ darkMode }) => {
                       <p className="text-muted mb-0">📍 {shelter.location}</p>
                     </div>
                     <div className="text-end">
-                      {shelter.verified && <span className="badge bg-success mb-2">✅ Verified</span>}
-                      <div className={`badge bg-${getOccupancyColor(shelter.currentOccupancy, shelter.capacity)}`}>
-                        {getOccupancyPercentage(shelter.currentOccupancy, shelter.capacity)}% Full
+                      {shelter.verified && <span className="badge bg-success m-2">✅ Verified</span>}
+                      <div className={`badge bg-${getOccupancyColor(shelter.current_occupancy, shelter.capacity)}`}>
+                        {getOccupancyPercentage(shelter.current_occupancy, shelter.capacity)}% Full
                       </div>
                     </div>
                   </div>
@@ -199,13 +142,13 @@ const SheltersPage = ({ darkMode }) => {
                     <div className="d-flex justify-content-between mb-2">
                       <span>Occupancy</span>
                       <span>
-                        {shelter.currentOccupancy}/{shelter.capacity}
+                        {shelter.current_occupancy}/{shelter.capacity}
                       </span>
                     </div>
                     <div className="progress" style={{ height: "8px" }}>
                       <div
-                        className={`progress-bar bg-${getOccupancyColor(shelter.currentOccupancy, shelter.capacity)}`}
-                        style={{ width: `${getOccupancyPercentage(shelter.currentOccupancy, shelter.capacity)}%` }}
+                        className={`progress-bar bg-${getOccupancyColor(shelter.current_occupancy, shelter.capacity)}`}
+                        style={{ width: `${getOccupancyPercentage(shelter.current_occupancy, shelter.capacity)}%` }}
                       ></div>
                     </div>
                   </div>

@@ -28,13 +28,20 @@ class Disaster(models.Model):
 class Shelter(models.Model):
     name = models.CharField(max_length=100)
     description = models.TextField()
+    location = models.CharField(max_length=255)  # new
     latitude = models.FloatField()
     longitude = models.FloatField()
-    capacity = models.IntegerField(default=50)  # optional
+    capacity = models.IntegerField(default=50)
+    current_occupancy = models.IntegerField(default=0)  # new
+    contact = models.CharField(max_length=100, blank=True, null=True)  # new
+    verified = models.BooleanField(default=False)  # new
+    amenities = models.JSONField(default=list, blank=True)  # new
+    shelter_type = models.CharField(max_length=50, default="community")  # new
     created_at = models.DateTimeField(auto_now_add=True)
 
     def __str__(self):
         return self.name
+
 
 
 class Volunteer(models.Model):
