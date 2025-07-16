@@ -91,6 +91,7 @@ const VolunteerApplicationPage = ({ darkMode, user }) => {
         languages: formData.languages,
       };
 
+      // eslint-disable-next-line no-unused-vars
       const response = await axios.post(
         "http://127.0.0.1:8000/api/volunteer/register/",
         payload,
