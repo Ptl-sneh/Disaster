@@ -1,6 +1,6 @@
 "use client"
 
-import { useState,useEffect } from "react"
+import { useState, useEffect } from "react"
 import axios from "axios"
 import ShelterMapSection from "./ShelterMapSection"
 
@@ -8,29 +8,32 @@ const SheltersPage = ({ darkMode }) => {
   const [searchTerm, setSearchTerm] = useState("")
   const [filterType, setFilterType] = useState("all")
   const [shelters, setShelters] = useState([])
+  const [selectedShelter, setSelectedShelter] = useState(null)
+  const [showModal, setShowModal] = useState(false)
 
-useEffect(() => {
-  axios.get("http://127.0.0.1:8000/api/shelters/")
-    .then((res) => {
-      const transformed = res.data.map((shelter) => ({
-        ...shelter,
-        location: shelter.location || "Unknown location",
-        currentOccupancy: shelter.current_occupancy || 0,
-        contact: shelter.contact || "(N/A)",
-        verified: shelter.verified || false,
-        amenities: shelter.amenities || [],
-        type: shelter.shelter_type,
-        coordinates: {
-          lat: shelter.latitude,
-          lng: shelter.longitude,
-        }
-      }))
-      setShelters(transformed)
-    })
-    .catch((err) => {
-      console.error("Error fetching shelters:", err)
-    })
-}, [])
+
+  useEffect(() => {
+    axios.get("http://127.0.0.1:8000/api/shelters/")
+      .then((res) => {
+        const transformed = res.data.map((shelter) => ({
+          ...shelter,
+          location: shelter.location || "Unknown location",
+          currentOccupancy: shelter.current_occupancy || 0,
+          contact: shelter.contact || "(N/A)",
+          verified: shelter.verified || false,
+          amenities: shelter.amenities || [],
+          type: shelter.shelter_type,
+          coordinates: {
+            lat: shelter.latitude,
+            lng: shelter.longitude,
+          }
+        }))
+        setShelters(transformed)
+      })
+      .catch((err) => {
+        console.error("Error fetching shelters:", err)
+      })
+  }, [])
 
 
   const filteredShelters = shelters.filter((shelter) => {
@@ -58,6 +61,7 @@ useEffect(() => {
   }
 
   return (
+
     <div className={`shelters-page py-4 ${darkMode ? "bg-dark text-light" : "bg-light"}`}>
       <div className="container">
         {/* Header */}
@@ -69,7 +73,7 @@ useEffect(() => {
         </div>
 
         {/* Map Section */}
-        <ShelterMapSection/>
+        <ShelterMapSection />
 
         {/* Search and Filter */}
         <div className="card border-0 shadow-lg mb-4 animate-slide-in-left">
@@ -180,8 +184,19 @@ useEffect(() => {
                   {/* Action Buttons */}
                   <div className="d-grid gap-2 d-md-flex">
                     <button className="btn btn-primary btn-sm flex-fill">📍 Get Directions</button>
-                    <button className="btn btn-outline-primary btn-sm flex-fill">📞 Call Now</button>
-                    <button className="btn btn-outline-secondary btn-sm">ℹ️ More Info</button>
+                    <a href={`tel:${shelter.contact}`} className="btn btn-outline-primary btn-sm flex-fill" >
+                      📞 Call Now
+                    </a>
+
+                    <button
+                      className="btn btn-outline-secondary btn-sm"
+                      onClick={() => {
+                        setSelectedShelter(shelter)
+                        setShowModal(true)
+                      }}
+                    >
+                      ℹ️ More Info
+                    </button>
                   </div>
                 </div>
               </div>
@@ -240,9 +255,51 @@ useEffect(() => {
           </div>
         </div>
       </div>
+      {selectedShelter && showModal && (
+        <div className="modal fade show d-block" tabIndex="-1" style={{ background: "rgba(0, 0, 0, 0.6)" }}>
+          <div className="modal-dialog modal-lg modal-dialog-centered">
+            <div className="modal-content">
+              <div className="modal-header">
+                <h5 className="modal-title">{selectedShelter.name}</h5>
+                <button type="button" className="btn-close" onClick={() => setShowModal(false)}></button>
+              </div>
+              <div className="modal-body">
+                <p><strong>📍 Location:</strong> {selectedShelter.location}</p>
+                <p><strong>🏠 Type:</strong> {selectedShelter.type}</p>
+                <p><strong>📞 Contact:</strong> {selectedShelter.contact}</p>
+                <p><strong>ℹ️ Description:</strong> {selectedShelter.description || "No description available"}</p>
+                <p><strong>✅ Verified:</strong> {selectedShelter.verified ? "Yes" : "No"}</p>
+
+                {/* Amenities */}
+                <div className="mb-3">
+                  <strong>🏷️ Amenities:</strong>
+                  <div className="d-flex flex-wrap gap-1 mt-2">
+                    {selectedShelter.amenities.map((a, i) => (
+                      <span key={i} className="badge bg-secondary">{a}</span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Photos (mocked) */}
+                <div className="mt-4">
+                  <strong>📸 Photos:</strong>
+                  <div className="d-flex gap-2 flex-wrap mt-2">
+                    {/* You can replace these URLs with actual image links from your DB later */}
+                    <img src="https://source.unsplash.com/300x200/?shelter,building" className="img-fluid rounded" alt="Shelter" />
+                    <img src="https://source.unsplash.com/301x200/?refugee,camp" className="img-fluid rounded" alt="Shelter" />
+                  </div>
+                </div>
+              </div>
+              <div className="modal-footer">
+                <button className="btn btn-secondary" onClick={() => setShowModal(false)}>Close</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   )
 }
 
 export default SheltersPage
-    

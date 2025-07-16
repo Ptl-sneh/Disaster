@@ -5,3 +5,5 @@ admin.site.register(Disaster)
 admin.site.register(Shelter)
 admin.site.register(Volunteer)
 admin.site.register(ContactMessage)
+
+
