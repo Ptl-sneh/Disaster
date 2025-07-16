@@ -1,11 +1,12 @@
 /* eslint-disable no-unused-vars */
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Link } from "react-router-dom"
-import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
-import 'leaflet/dist/leaflet.css';
-import DisasterMapSection from './DisasterMapSection';
+import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet'
+import 'leaflet/dist/leaflet.css'
+import DisasterMapSection from './DisasterMapSection'
+import axios from 'axios'
 
 const Dashboard = ({ darkMode }) => {
   const [stats, setStats] = useState({
@@ -15,53 +16,20 @@ const Dashboard = ({ darkMode }) => {
     activeReports: 23,
   })
 
-  const [recentReports] = useState([
-    {
-      id: 1,
-      type: "Flood",
-      location: "Downtown District",
-      severity: "High",
-      time: "2 hours ago",
-      status: "Active",
-      reporter: "John Smith",
-    },
-    {
-      id: 2,
-      type: "Fire",
-      location: "Industrial Zone",
-      severity: "Critical",
-      time: "4 hours ago",
-      status: "Responding",
-      reporter: "Emergency Services",
-    },
-    {
-      id: 3,
-      type: "Earthquake",
-      location: "Residential Area",
-      severity: "Medium",
-      time: "6 hours ago",
-      status: "Resolved",
-      reporter: "Sarah Johnson",
-    },
-    {
-      id: 4,
-      type: "Storm",
-      location: "Coastal Region",
-      severity: "High",
-      time: "8 hours ago",
-      status: "Active",
-      reporter: "Weather Station",
-    },
-    {
-      id: 5,
-      type: "Landslide",
-      location: "Mountain Road",
-      severity: "Medium",
-      time: "12 hours ago",
-      status: "Cleared",
-      reporter: "Highway Patrol",
-    },
-  ])
+  const [disasterReports, setDisasterReports] = useState([])
+
+  useEffect(() => {
+    axios.get("http://127.0.0.1:8000/api/disasters/")
+      .then((response) => {
+        // Sort disasters by most recent
+        const sorted = response.data.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        setDisasterReports(sorted)
+        console.log(sorted)
+      })
+      .catch((error) => {
+        console.error("Error fetching disaster reports:", error)
+      })
+  }, [])
 
   const getSeverityBadge = (severity) => {
     switch (severity) {
@@ -69,23 +37,10 @@ const Dashboard = ({ darkMode }) => {
         return "bg-danger"
       case "High":
         return "bg-warning"
-      case "Medium":
+      case "Moderate":
         return "bg-info"
-      default:
+      case "Low":
         return "bg-secondary"
-    }
-  }
-
-  const getStatusBadge = (status) => {
-    switch (status) {
-      case "Active":
-        return "bg-danger"
-      case "Responding":
-        return "bg-warning"
-      case "Resolved":
-        return "bg-success"
-      case "Cleared":
-        return "bg-success"
       default:
         return "bg-secondary"
     }
@@ -117,16 +72,17 @@ const Dashboard = ({ darkMode }) => {
             >
               🚨 Report
             </Link>
-
           </div>
         </div>
+
         {/* Map Section */}
         <DisasterMapSection />
+
         <div className="row mb-4">
           {/* Recent Reports */}
           <div className="col-lg-9 mb-4">
             <div className="card border-0 shadow-lg animate-slide-in-left">
-              <div className="card-header bg-transparent border-0 p-4">
+              <div className="card-header bg-transparent border-0 p-3">
                 <div className="d-flex justify-content-between align-items-center">
                   <h4 className="mb-0 mx-auto">📋 Recent Disaster Reports</h4>
                 </div>
@@ -137,30 +93,24 @@ const Dashboard = ({ darkMode }) => {
                     <thead className={darkMode ? "table-dark" : "table-light"}>
                       <tr>
                         <th className="text-center">Type</th>
+                        <th className="text-center">Description</th>
                         <th className="text-center">Location</th>
                         <th className="text-center">Severity</th>
-                        <th className="text-center">Status</th>
-                        <th className="text-center">Time</th>
                         <th className="text-center">Reporter</th>
                       </tr>
                     </thead>
                     <tbody>
-                      {recentReports.map((report) => (
+                      {disasterReports.slice(0, 5).map((report) => (
                         <tr key={report.id}>
                           <td className="text-center fw-bold">{report.type}</td>
-                          <td className="text-center">{report.location}</td>
+                          <td className="text-center">{report.description}</td>
+                          <td className="text-center">{report.address}</td>
                           <td className="text-center">
-                            <span className={`badge ${getSeverityBadge(report.severity)}`}>
-                              {report.severity}
+                            <span className={`badge ${getSeverityBadge(report.severity_level)}`}>
+                              {report.severity_level}
                             </span>
                           </td>
-                          <td className="text-center">
-                            <span className={`badge ${getStatusBadge(report.status)}`}>
-                              {report.status}
-                            </span>
-                          </td>
-                          <td className="text-center text-muted">{report.time}</td>
-                          <td className="text-center">{report.reporter}</td>
+                          <td className="text-center">{report.reported_by || "Unknown"}</td>
                         </tr>
                       ))}
                     </tbody>
@@ -170,15 +120,14 @@ const Dashboard = ({ darkMode }) => {
             </div>
           </div>
 
-
+          {/* Quick Actions */}
           <div className="col-lg-3 mb-4">
-            {/* Quick Actions */}
             <div className="card border-0 shadow-lg animate-slide-in-right">
-              <div className="card-header bg-transparent border-0 p-4">
+              <div className="card-header bg-transparent border-0 p-3">
                 <h5 className="mb-0">⚡ Quick Actions</h5>
               </div>
-              <div className="card-body p-4">
-                <div className="d-grid gap-3">
+              <div className="card-body p-2">
+                <div className="d-grid gap-2">
                   <Link to="/report" className="btn btn-danger btn-animated">
                     🚨 Report Emergency
                   </Link>
@@ -194,6 +143,7 @@ const Dashboard = ({ darkMode }) => {
             </div>
           </div>
         </div>
+
         {/* Stats Cards */}
         <div className="row animate-fade-in-up">
           <div className="col-lg-3 col-md-6 mb-4">

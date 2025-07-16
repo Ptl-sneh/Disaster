@@ -18,11 +18,23 @@ class UserRegisterSerializer(serializers.ModelSerializer):
         )
         return user
 
+from rest_framework import serializers
+from .models import Disaster
+
 class DisasterSerializer(serializers.ModelSerializer):
+    reported_by = serializers.SerializerMethodField()
+
     class Meta:
         model = Disaster
         fields = '__all__'
         read_only_fields = ['reported_by', 'is_verified', 'timestamp']
+
+    def get_reported_by(self, obj):
+        full_name = obj.reported_by.get_full_name()
+        if full_name.strip():
+            return full_name
+        return obj.reported_by.username
+
         
 class ShelterSerializer(serializers.ModelSerializer):
     class Meta:
