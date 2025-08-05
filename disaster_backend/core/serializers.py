@@ -1,6 +1,7 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Disaster,Shelter,Volunteer,ContactMessage
+from .models import Disaster,Shelter,Volunteer,ContactMessage,ShelterImage
+from django.contrib import admin
 
 
 class UserRegisterSerializer(serializers.ModelSerializer):
@@ -36,10 +37,24 @@ class DisasterSerializer(serializers.ModelSerializer):
         return obj.reported_by.username
 
         
+# class ShelterSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Shelter
+#         fields = '__all__'
+
+class ShelterImageSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ShelterImage
+        fields = ['id', 'image']
+
+# Updated ShelterSerializer to include images
 class ShelterSerializer(serializers.ModelSerializer):
+    images = ShelterImageSerializer(many=True, read_only=True)  # Add this line
+
     class Meta:
         model = Shelter
-        fields = '__all__'
+        fields = '__all__'  # includes all Shelter fields + images
+
 
 class VolunteerSerializer(serializers.ModelSerializer):
     email = serializers.EmailField(source='user.email', read_only=True)

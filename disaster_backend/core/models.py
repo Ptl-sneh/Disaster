@@ -41,6 +41,13 @@ class Shelter(models.Model):
 
     def __str__(self):
         return self.name
+    
+class ShelterImage(models.Model):
+    shelter = models.ForeignKey(Shelter, on_delete=models.CASCADE, related_name='images')
+    image = models.ImageField(upload_to='shelter_images/')
+
+    def __str__(self):
+        return f"Image for {self.shelter.name}"
 
 class Volunteer(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE,null=True, blank=True)

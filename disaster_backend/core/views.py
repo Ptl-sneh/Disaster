@@ -1,4 +1,4 @@
-from rest_framework import status,generics
+from rest_framework import status,generics,viewsets
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
@@ -62,6 +62,10 @@ def list_shelters(request):
     shelters = Shelter.objects.all()
     serializer = ShelterSerializer(shelters, many=True)
     return Response(serializer.data)
+
+class ShelterViewSet(viewsets.ModelViewSet):
+    queryset = Shelter.objects.all()
+    serializer_class = ShelterSerializer
 
 # @api_view(['POST'])
 # @permission_classes([IsAuthenticated])

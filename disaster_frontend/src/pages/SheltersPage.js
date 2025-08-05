@@ -18,14 +18,15 @@ const SheltersPage = ({ darkMode }) => {
         const transformed = res.data.map((shelter) => ({
           ...shelter,
           location: shelter.location || "Unknown location",
-          currentOccupancy: shelter.current_occupancy || 0,
-          contact: shelter.contact || "(N/A)",
-          verified: shelter.verified || false,
-          amenities: shelter.amenities || [],
-          type: shelter.shelter_type,
+          currentOccupancy: shelter.current_occupancy ?? 0,
+          contact: shelter.contact || "N/A",
+          verified: shelter.verified ?? false,
+          amenities: Array.isArray(shelter.amenities) ? shelter.amenities : [],
+          type: shelter.shelter_type || "unknown",
+          images: Array.isArray(shelter.images) ? shelter.images : [],
           coordinates: {
-            lat: shelter.latitude,
-            lng: shelter.longitude,
+            lat: parseFloat(shelter.latitude),
+            lng: parseFloat(shelter.longitude),
           }
         }))
         setShelters(transformed)
@@ -34,6 +35,7 @@ const SheltersPage = ({ darkMode }) => {
         console.error("Error fetching shelters:", err)
       })
   }, [])
+
 
 
   const filteredShelters = shelters.filter((shelter) => {
@@ -183,7 +185,22 @@ const SheltersPage = ({ darkMode }) => {
 
                   {/* Action Buttons */}
                   <div className="d-grid gap-2 d-md-flex">
-                    <button className="btn btn-primary btn-sm flex-fill">📍 Get Directions</button>
+                    <button
+                      className="btn btn-primary btn-sm flex-fill"
+                      onClick={() => {
+                        navigator.geolocation.getCurrentPosition((position) => {
+                          const originLat = position.coords.latitude;
+                          const originLng = position.coords.longitude;
+                          window.open(
+                            `https://www.google.com/maps/dir/?api=1&origin=${originLat},${originLng}&destination=${shelter.latitude},${shelter.longitude}`,
+                            "_blank"
+                          );
+                        });
+                      }}
+                    >
+                      📍 Get Directions
+                    </button>
+
                     <a href={`tel:${shelter.contact}`} className="btn btn-outline-primary btn-sm flex-fill" >
                       📞 Call Now
                     </a>
@@ -284,11 +301,22 @@ const SheltersPage = ({ darkMode }) => {
                 <div className="mt-4">
                   <strong>📸 Photos:</strong>
                   <div className="d-flex gap-2 flex-wrap mt-2">
-                    {/* You can replace these URLs with actual image links from your DB later */}
-                    <img src="https://source.unsplash.com/300x200/?shelter,building" className="img-fluid rounded" alt="Shelter" />
-                    <img src="https://source.unsplash.com/301x200/?refugee,camp" className="img-fluid rounded" alt="Shelter" />
+                    {selectedShelter.images && selectedShelter.images.length > 0 ? (
+                      selectedShelter.images.map((img) => (
+                        <img
+                          key={img.id}
+                          src={`http://127.0.0.1:8000${img.image}`}  // ✅ fixed here
+                          className="img-fluid rounded"
+                          style={{ maxWidth: '300px', maxHeight: '200px' }}
+                          alt="Shelter"
+                        />
+                      ))
+                    ) : (
+                      <p>No images available</p>
+                    )}
                   </div>
                 </div>
+
               </div>
               <div className="modal-footer">
                 <button className="btn btn-secondary" onClick={() => setShowModal(false)}>Close</button>

@@ -80,7 +80,7 @@ const Dashboard = ({ darkMode }) => {
 
         <div className="row mb-4">
           {/* Recent Reports */}
-          <div className="col-lg-9 mb-4">
+          {/* <div className="col-lg-12 mb-4">
             <div className="card border-0 shadow-lg animate-slide-in-left">
               <div className="card-header bg-transparent border-0 p-3">
                 <div className="d-flex justify-content-between align-items-center">
@@ -118,30 +118,54 @@ const Dashboard = ({ darkMode }) => {
                 </div>
               </div>
             </div>
-          </div>
+          </div> */}
 
-          {/* Quick Actions */}
-          <div className="col-lg-3 mb-4">
-            <div className="card border-0 shadow-lg animate-slide-in-right">
+          <div className="col-lg-12 mb-4 d-flex">
+            <div className="card border-0 shadow-lg animate-slide-in-left w-100 h-100">
               <div className="card-header bg-transparent border-0 p-3">
-                <h5 className="mb-0">⚡ Quick Actions</h5>
+                <div className="d-flex justify-content-between align-items-center">
+                  <h4 className="mb-0 mx-auto">📋 Recent Disaster Reports</h4>
+                </div>
               </div>
-              <div className="card-body p-2">
-                <div className="d-grid gap-2">
-                  <Link to="/report" className="btn btn-danger btn-animated">
-                    🚨 Report Emergency
-                  </Link>
-                  <Link to="/shelters" className="btn btn-primary btn-animated">
-                    🏠 Find Shelter
-                  </Link>
-                  <Link to="/volunteers" className="btn btn-success btn-animated">
-                    🤝 Join Volunteers
-                  </Link>
-                  <button className="btn btn-warning btn-animated">📞 Emergency Contacts</button>
+              <div className="card-body p-0">
+                <div className="table-responsive">
+                  <table className="table table-hover mb-0 text-center">
+                    <thead className={darkMode ? "table-dark" : "table-light"}>
+                      <tr>
+                        <th className="text-center ">Type</th>
+                        <th className="text-center">Description</th>
+                        <th className="text-center">Location</th>
+                        <th className="text-center">Severity</th>
+                        <th className="text-center">Reporter</th>
+                      </tr>
+                    </thead>
+                  </table>
+                  <div style={{ maxHeight: "200px", overflowY: "auto" }}>
+                    <table className="table table-hover mb-0 text-center">
+                      <tbody>
+                        {disasterReports.map((report) => (
+                          <tr key={report.id}>
+                            <td className="text-center fw-bold">{report.type}</td>
+                            <td className="text-center">{report.description}</td>
+                            <td className="text-center">{report.address}</td>
+                            <td className="text-center">
+                              <span className={`badge ${getSeverityBadge(report.severity_level)}`}>
+                                {report.severity_level}
+                              </span>
+                            </td>
+                            <td className="text-center">{report.reported_by || "Unknown"}</td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
+
+          {/* Quick Actions */}
+
         </div>
 
         {/* Stats Cards */}

@@ -2,7 +2,16 @@
 
 import { useState, useEffect } from "react"
 import { useNavigate } from "react-router-dom"
-import axios from "axios"                // ⬅️ NEW
+import axios from "axios"
+import Logistics from '../assets/roles/customer-service.png'
+import Communication from '../assets/roles/phone-call.png'
+import SearchRescue from '../assets/roles/helicopter.png'
+import Medical from '../assets/roles/surgeon.png'
+import Mental from '../assets/roles/brain.png'
+import Transportation from '../assets/roles/school-bus.png'
+import Shelter from '../assets/roles/house.png'
+import Technical from '../assets/roles/chat.png'
+
 
 const VolunteersPage = ({ darkMode }) => {
   /* ──────────────────────────────────────────────────────────
@@ -38,6 +47,17 @@ const VolunteersPage = ({ darkMode }) => {
     "Shelter Management",
     "Technical Support",
   ]
+  const roleImages = {
+    "Technical Support": Technical,
+    "Logistics": Logistics,
+    "Medical Professional": Medical,
+    "Transportation": Transportation,
+    "Shelter Management": Shelter,
+    "Search & Rescue": SearchRescue,
+    "Communications": Communication,
+    "Mental Health Support": Mental,
+  };
+
 
   /* ──────────────────────────────────────────────────────────
      4️⃣ Derived helpers (unchanged)
@@ -54,27 +74,27 @@ const VolunteersPage = ({ darkMode }) => {
   })
 
   const getAvailabilityBadge = (availability) => {
-  const value = availability?.toLowerCase();
+    const value = availability?.toLowerCase();
 
-  switch (value) {
-    case "available":
-      return { text: "Available", class: "bg-success" };
-    case "on-call":
-      return { text: "On Call", class: "bg-warning text-dark" };
-    case "unavailable":
-      return { text: "Unavailable", class: "bg-danger" };
-    default:
-      return { text: "Unknown", class: "bg-secondary" };
-  }
-};
+    switch (value) {
+      case "available":
+        return { text: "Available", class: "bg-success" };
+      case "on-call":
+        return { text: "On Call", class: "bg-warning text-dark" };
+      case "unavailable":
+        return { text: "Unavailable", class: "bg-danger" };
+      default:
+        return { text: "Unknown", class: "bg-secondary" };
+    }
+  };
 
 
- const getAvailabilityStats = () => {
-  const available = volunteers.filter((v) => v.availability === "available").length;
-  const onCall = volunteers.filter((v) => v.availability === "on-call").length;
-  const unavailable = volunteers.filter((v) => v.availability === "unavailable").length;
-  return { available, onCall, unavailable };
-};
+  const getAvailabilityStats = () => {
+    const available = volunteers.filter((v) => v.availability === "available").length;
+    const onCall = volunteers.filter((v) => v.availability === "on-call").length;
+    const unavailable = volunteers.filter((v) => v.availability === "unavailable").length;
+    return { available, onCall, unavailable };
+  };
 
 
   const handleContactVolunteer = (volunteer) => {
@@ -131,21 +151,21 @@ const VolunteersPage = ({ darkMode }) => {
           </div>
           <div className="col-md-4 mb-3">
             <div className="card card-hover border-0 shadow-lg">
-    <div className="card-body text-center p-4">
-      <div className="display-4 mb-2">⏳</div>
-      <h3 className="text-warning">{stats.onCall}</h3>
-      <h6 className="text-muted">On Call</h6>
-    </div>
-  </div>
+              <div className="card-body text-center p-4">
+                <div className="display-4 mb-2">⏳</div>
+                <h3 className="text-warning">{stats.onCall}</h3>
+                <h6 className="text-muted">On Call</h6>
+              </div>
+            </div>
           </div>
           <div className="col-md-4 mb-3">
             <div className="card card-hover border-0 shadow-lg">
-    <div className="card-body text-center p-4">
-      <div className="display-4 mb-2">🚫</div>
-      <h3 className="text-danger">{stats.unavailable}</h3>
-      <h6 className="text-muted">Unavailable</h6>
-    </div>
-  </div>
+              <div className="card-body text-center p-4">
+                <div className="display-4 mb-2">🚫</div>
+                <h3 className="text-danger">{stats.unavailable}</h3>
+                <h6 className="text-muted">Unavailable</h6>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -184,7 +204,7 @@ const VolunteersPage = ({ darkMode }) => {
                   <option value="all">All Status</option>
                   <option value="available">Available</option>
                   <option value="on-call">On Call</option>
-<option value="unavailable">Unavailable</option>
+                  <option value="unavailable">Unavailable</option>
 
                 </select>
               </div>
@@ -213,11 +233,16 @@ const VolunteersPage = ({ darkMode }) => {
                   <div className="d-flex align-items-start mb-3">
                     <div className="me-3">
                       <div
-                        className="bg-primary rounded-circle d-flex align-items-center justify-content-center"
-                        style={{ width: "60px", height: "60px", fontSize: "24px" }}
+                        className="rounded-circle overflow-hidden d-flex align-items-center justify-content-center bg-light"
+                        style={{ width: "60px", height: "60px" }}
                       >
-                        {volunteer.avatar}
+                        <img
+                          src={roleImages[volunteer.role] } // fallback if role not found
+                          alt={volunteer.role}
+                          style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                        />
                       </div>
+
                     </div>
                     <div className="flex-grow-1">
                       <div className="d-flex justify-content-between align-items-start">
