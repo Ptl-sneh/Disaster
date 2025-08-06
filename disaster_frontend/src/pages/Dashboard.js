@@ -89,20 +89,22 @@ const Dashboard = ({ darkMode }) => {
               </div>
               <div className="card-body p-0">
                 <div className="table-responsive">
-                  <table className="table table-hover mb-0 text-center">
+                  <table
+                    className="table table-hover mb-0 text-center"
+                    style={{ tableLayout: "fixed", width: "99%" }}
+                  >
                     <thead className={darkMode ? "table-dark" : "table-light"}>
                       <tr>
-                        <th className="text-center" style={{ wordWrap: "break-word", whiteSpace: "normal", maxWidth: "200px", margin: "auto" }}>
-                         
-                          Type</th>
-                          
-                        <th className="text-center" style={{ wordWrap: "break-word", whiteSpace: "normal", maxWidth: "200px", margin: "auto" }}>Description</th>
-                        <th className="text-center" style={{ wordWrap: "break-word", whiteSpace: "normal", maxWidth: "200px", margin: "auto" }}>Location</th>
-                        <th className="text-center" style={{ wordWrap: "break-word", whiteSpace: "normal", maxWidth: "200px", margin: "auto" }}>Severity</th>
-                        <th className="text-center" style={{ wordWrap: "break-word", whiteSpace: "normal", maxWidth: "200px", margin: "auto" }}>Reporter</th>
+                        <th style={{ maxWidth: "200px" }}>Type</th>
+                        <th style={{ maxWidth: "200px" }}>Description</th>
+                        <th style={{ maxWidth: "200px" }}>Location</th>
+                        <th style={{ maxWidth: "200px" }}>Severity</th>
+                        <th style={{ maxWidth: "200px" }}>Reporter</th>
                       </tr>
                     </thead>
                   </table>
+
+                  {/* Scrollable tbody */}
                   <div style={{ maxHeight: "200px", overflowY: "auto" }}>
                     <table
                       className="table table-hover mb-0 text-center"
@@ -111,29 +113,29 @@ const Dashboard = ({ darkMode }) => {
                       <tbody>
                         {disasterReports.map((report) => (
                           <tr key={report.id}>
-                            <td className="text-center fw-bold">
+                            <td>
                               <div style={{ wordWrap: "break-word", whiteSpace: "normal", maxWidth: "200px", margin: "auto" }}>
-                                {report.type}</div></td>
-                            <td className="text-center">
+                                {report.type}
+                              </div>
+                            </td>
+                            <td>
                               <div style={{ wordWrap: "break-word", whiteSpace: "normal", maxWidth: "200px", margin: "auto" }}>
                                 {report.description}
                               </div>
                             </td>
-                            <td className="text-center">
+                            <td>
                               <div style={{ wordWrap: "break-word", whiteSpace: "normal", maxWidth: "150px", margin: "auto" }}>
                                 {report.address}
                               </div>
                             </td>
-
-                            <td className="text-center">
+                            <td>
                               <div style={{ wordWrap: "break-word", whiteSpace: "normal", maxWidth: "200px", margin: "auto" }}>
-                              
-                              <span className={`badge ${getSeverityBadge(report.severity_level)}`}>
-                                {report.severity_level}
-                              </span>
+                                <span className={`badge ${getSeverityBadge(report.severity_level)}`}>
+                                  {report.severity_level}
+                                </span>
                               </div>
                             </td>
-                            <td className="text-center">{report.reported_by || "Unknown"}</td>
+                            <td>{report.reported_by || "Unknown"}</td>
                           </tr>
                         ))}
                       </tbody>
@@ -141,6 +143,8 @@ const Dashboard = ({ darkMode }) => {
                   </div>
                 </div>
               </div>
+
+
             </div>
           </div>
 
