@@ -299,9 +299,7 @@ const AboutPage = ({ darkMode }) => {
                   there's a place for you in the DisasterWatch community.
                 </p>
                 <div className="d-flex flex-wrap justify-content-center gap-3">
-                  <button className="btn btn-primary btn-lg btn-animated">🤝 Become a Volunteer</button>
-                  <button className="btn btn-outline-primary btn-lg btn-animated">💼 Join Our Team</button>
-                  <button className="btn btn-outline-secondary btn-lg btn-animated">🤝 Partner With Us</button>
+                  <button className="btn btn-primary btn-lg btn-animated" >🤝 Become a Volunteer</button>
                 </div>
               </div>
             </div>

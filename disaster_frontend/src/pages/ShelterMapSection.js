@@ -3,14 +3,12 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-
-// ✅ Leaflet setup
 import L from "leaflet";
 import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
-// ✅ Custom house icon using PUBLIC folder path (no import needed)
+// ✅ Custom house icon
 const customHouseIcon = new L.Icon({
-  iconUrl: "/assets/hm.png", // correct relative path from public/
+  iconUrl: "/assets/hm.png",
   iconSize: [32, 45],
   iconAnchor: [19, 45],
   popupAnchor: [0, -45],
@@ -19,7 +17,7 @@ const customHouseIcon = new L.Icon({
   shadowAnchor: [12, 41],
 });
 
-const shelterMapSection = () => {
+const ShelterMapSection = () => {
   const [Shelters, setShelters] = useState([]);
 
   useEffect(() => {
@@ -48,6 +46,7 @@ const shelterMapSection = () => {
                 attribution='&copy; OpenStreetMap contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
+
               {Shelters.filter(
                 (shelter) =>
                   shelter.latitude !== null &&
@@ -57,18 +56,51 @@ const shelterMapSection = () => {
               ).map((shelter) => (
                 <Marker
                   key={shelter.id}
-                  position={[
-                    parseFloat(shelter.latitude),
-                    parseFloat(shelter.longitude),
-                  ]}
+                  position={[parseFloat(shelter.latitude), parseFloat(shelter.longitude)]}
                   icon={customHouseIcon}
                 >
-                  <Popup>
-                    <strong>{shelter.shelter_type}</strong>
-                    <br />
-                    {shelter.location || "Unknown Location"}
-                    <br />
-                    Status: {shelter.description || "No details"}
+                  <Popup maxWidth={300} minWidth={200}>
+                    <div
+                      style={{
+                        padding: "12px 14px",
+                        backgroundColor: "#f9f9f9",
+                        borderRadius: "12px",
+                        boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                        fontFamily: "Segoe UI, sans-serif",
+                        textAlign: "left",
+                        width: "100%",
+                      }}
+                    >
+                      {/* Title */}
+                      <div style={{ fontSize: "1rem", fontWeight: "bold", marginBottom: "8px" }}>
+                        <span
+                          style={{
+                            backgroundColor: "#e3f2fd",
+                            color: "#0d47a1",
+                            padding: "4px 8px",
+                            borderRadius: "6px",
+                            fontSize: "1rem",
+                          }}
+                        >
+                          {shelter.name}
+
+                        </span>
+                      </div>
+
+                      {/* Location */}
+                      <div style={{ fontSize: "0.85rem", marginBottom: "6px", color: "#444" }}>
+                        🏠 <strong>Type:</strong>  {shelter.shelter_type || "Shelter"}
+                      </div>
+                      {/* Location */}
+                      <div style={{ fontSize: "0.85rem", marginBottom: "6px", color: "#444" }}>
+                        📍 <strong>Location:</strong> {shelter.location || "Unknown"}
+                      </div>
+
+                      {/* Status / Description */}
+                      <div style={{ fontSize: "0.85rem", color: "#555" }}>
+                        📋 <strong>Status:</strong> {shelter.description || "No details"}
+                      </div>
+                    </div>
                   </Popup>
                 </Marker>
               ))}
@@ -80,4 +112,4 @@ const shelterMapSection = () => {
   );
 };
 
-export default shelterMapSection;
+export default ShelterMapSection;

@@ -2,21 +2,27 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
-
-// ✅ FIX: Import Leaflet and default marker icons
 import L from "leaflet";
-import markerIcon2x from "leaflet/dist/images/marker-icon-2x.png";
-import markerIcon from "leaflet/dist/images/marker-icon.png";
-import markerShadow from "leaflet/dist/images/marker-shadow.png";
 
-// ✅ Override the default icon path resolution
-delete L.Icon.Default.prototype._getIconUrl;
+const getDisasterIcon = (type) => {
+  const iconMap = {
+    flood: "marker-flood.png",
+    fire: "marker-fire.png",
+    earthquake: "marker-earthquake.png",
+    cyclone: "marker-cyclone.png",
+    landslide: "marker-landslide.png",
+  };
 
-L.Icon.Default.mergeOptions({
-  iconRetinaUrl: markerIcon2x,
-  iconUrl: markerIcon,
-  shadowUrl: markerShadow,
-});
+  const iconFilename = iconMap[type.toLowerCase()] || "marker-flood.png";
+
+  return new L.Icon({
+    iconUrl: `/marker-icons/${iconFilename}`,
+    iconSize: [40, 40],
+    iconAnchor: [20, 40],
+    popupAnchor: [0, -36],
+    className: "disaster-marker-icon",
+  });
+};
 
 const DisasterMapSection = () => {
   const [disasters, setDisasters] = useState([]);
@@ -29,24 +35,21 @@ const DisasterMapSection = () => {
   }, []);
 
   return (
-    <div className="col-lg-12" style={{ height: "650px", marginBottom: '125px' }}>
+    <div className="col-lg-12" style={{ height: "650px", marginBottom: "125px" }}>
       <div className="card border-0 shadow-lg animate-slide-in-right">
         <div className="card-body">
           <div className="rounded-3 mb-3">
             <MapContainer
-              center={[23.0225, 72.5714]} // Ahmedabad
+              center={[23.0225, 72.5714]}
               zoom={6}
               scrollWheelZoom={true}
-              style={{
-                height: "650px",
-                width: "100%",
-                borderRadius: "0.5rem",
-              }}
+              style={{ height: "650px", width: "100%", borderRadius: "0.5rem" }}
             >
               <TileLayer
                 attribution='&copy; OpenStreetMap contributors'
                 url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
               />
+
               {disasters
                 .filter(
                   (disaster) =>
@@ -58,23 +61,66 @@ const DisasterMapSection = () => {
                 .map((disaster) => (
                   <Marker
                     key={disaster.id}
-                    position={[
-                      parseFloat(disaster.latitude),
-                      parseFloat(disaster.longitude),
-                    ]}
+                    position={[parseFloat(disaster.latitude), parseFloat(disaster.longitude)]}
+                    icon={getDisasterIcon(disaster.type)}
                   >
-                    <Popup>
-                      <strong>{disaster.type}</strong>
-                      <br />
-                      {disaster.location}
-                      <br />
-                      Status: {disaster.description}
-                      <br />
-                      Time: {disaster.timestamp}
+                    <Popup maxWidth={300} minWidth={200}>
+                      <div
+                        style={{
+                          padding: "12px 14px",
+                          backgroundColor: "#f9f9f9",
+                          borderRadius: "12px",
+                          boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
+                          fontFamily: "Segoe UI, sans-serif",
+                          textAlign: "left",
+                          width: "100%",
+                        }}
+                      >
+                        <div
+                          style={{
+                            fontSize: "1rem",
+                            fontWeight: "bold",
+                            marginBottom: "8px",
+                            display: "flex",
+                            alignItems: "center",
+                          }}
+                        >
+                          <span
+                            style={{
+                              backgroundColor:
+                                disaster.type.toLowerCase() === "fire"
+                                  ? "#ffcccc"
+                                  : disaster.type.toLowerCase() === "flood"
+                                  ? "#cce5ff"
+                                  : disaster.type.toLowerCase() === "earthquake"
+                                  ? "#ffe0b2"
+                                  : "#e0e0e0",
+                              color: "#333",
+                              padding: "4px 8px",
+                              borderRadius: "6px",
+                              fontSize: "0.85rem",
+                            }}
+                          >
+                            {disaster.type.toUpperCase()}
+                          </span>
+                        </div>
+
+                        <div style={{ fontSize: "0.9rem", marginBottom: "8px", color: "#444" }}>
+                          📋 <strong>Status:</strong> {disaster.description}
+                        </div>
+
+                        <div style={{ fontSize: "0.85rem", marginBottom: "6px", color: "#555" }}>
+                          📍 <strong>Location:</strong> {disaster.address}
+                        </div>
+
+                        <div style={{ fontSize: "0.8rem", color: "#777" }}>
+                          ⏱️ <strong>Time:</strong>{" "}
+                          {new Date(disaster.timestamp).toLocaleString()}
+                        </div>
+                      </div>
                     </Popup>
                   </Marker>
                 ))}
-
             </MapContainer>
           </div>
         </div>

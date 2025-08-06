@@ -289,13 +289,13 @@ const ContactPage = ({ darkMode }) => {
           <div className="col-lg-4 mb-5">
             <div className="animate-slide-in-right">
               {/* Contact Methods */}
-              <div className="card border-0 shadow-lg mb-4">
-                <div className="card-header bg-transparent border-0 p-4">
-                  <h5 className="mb-0">📞 Get in Touch</h5>
+              <div className="card border-0 shadow-lg mb-4" style={{height:'580px'}}>
+                <div className="card-header border-bottom p-4 bg-primary">
+                  <h5 className="mb-0 text-white fs-4">📞 Get in Touch</h5>
                 </div>
                 <div className="card-body p-0">
                   {contactMethods.map((method, index) => (
-                    <div key={index} className="p-4 border-bottom">
+                    <div key={index} className="p-4 ">
                       <div className="d-flex align-items-start">
                         <div className="me-3">
                           <div
@@ -317,63 +317,7 @@ const ContactPage = ({ darkMode }) => {
                   ))}
                 </div>
               </div>
-
-              {/* Office Hours */}
-              <div className="card border-0 shadow-lg mb-4">
-                <div className="card-header bg-transparent border-0 p-4">
-                  <h5 className="mb-0">🕒 Office Hours</h5>
-                </div>
-                <div className="card-body p-4">
-                  <div className="mb-3">
-                    <strong>Emergency Support:</strong>
-                    <br />
-                    <span className="text-success">24/7 Available</span>
-                  </div>
-                  <div className="mb-3">
-                    <strong>General Support:</strong>
-                    <br />
-                    Monday - Friday: 9AM - 6PM
-                    <br />
-                    Saturday: 10AM - 4PM
-                    <br />
-                    Sunday: Closed
-                  </div>
-                  <div className="mb-0">
-                    <strong>Response Time:</strong>
-                    <br />
-                    <span className="text-info">Within 24 hours</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Social Media */}
-              <div className="card border-0 shadow-lg">
-                <div className="card-header bg-transparent border-0 p-4">
-                  <h5 className="mb-0">🌐 Follow Us</h5>
-                </div>
-                <div className="card-body p-4">
-                  <div className="d-flex justify-content-around">
-                    <a href="#" className="social-icon">
-                      📘
-                    </a>
-                    <a href="#" className="social-icon">
-                      🐦
-                    </a>
-                    <a href="#" className="social-icon">
-                      📷
-                    </a>
-                    <a href="#" className="social-icon">
-                      💼
-                    </a>
-                    <a href="#" className="social-icon">
-                      📺
-                    </a>
-                  </div>
-                  <p className="text-center text-muted small mt-3 mb-0">
-                    Stay updated with the latest emergency alerts and community news.
-                  </p>
-                </div>
-              </div>
+              
             </div>
           </div>
         </div>
@@ -386,7 +330,7 @@ const ContactPage = ({ darkMode }) => {
               <div key={index} className="col-md-4 mb-4">
                 <div className="card card-hover border-0 shadow-lg h-100">
                   <div className="card-body p-4 text-center">
-                    <h5 className="fw-bold mb-3">{office.city}</h5>
+                    <h5 className="fw-bold mb-3 ">{office.city}</h5>
                     <p className="mb-2">📍 {office.address}</p>
                     <p className="mb-2">📞 {office.phone}</p>
                     <p className="text-muted mb-0">🕒 {office.hours}</p>

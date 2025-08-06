@@ -6,6 +6,12 @@ DISASTER_TYPES = [
     ('Fire', 'Fire'),
     ('Flood', 'Flood'),
     ('Earthquake', 'Earthquake'),
+    ('Storm/Hurricane','Storm/Hurricane'),
+    ('Tornado','Tornado'),
+    ('Landslide','Landslide'),
+    ('Tsunami','Tsunami'),
+    ('Volcanic Eruption','Volcanic Eruption'),
+    ('Drought','Drought'),
     ('Other', 'Other'),
 ]
 

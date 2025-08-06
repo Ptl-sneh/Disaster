@@ -79,46 +79,6 @@ const Dashboard = ({ darkMode }) => {
         <DisasterMapSection />
 
         <div className="row mb-4">
-          {/* Recent Reports */}
-          {/* <div className="col-lg-12 mb-4">
-            <div className="card border-0 shadow-lg animate-slide-in-left">
-              <div className="card-header bg-transparent border-0 p-3">
-                <div className="d-flex justify-content-between align-items-center">
-                  <h4 className="mb-0 mx-auto">📋 Recent Disaster Reports</h4>
-                </div>
-              </div>
-              <div className="card-body p-0">
-                <div className="table-responsive">
-                  <table className="table table-hover mb-0 text-center">
-                    <thead className={darkMode ? "table-dark" : "table-light"}>
-                      <tr>
-                        <th className="text-center">Type</th>
-                        <th className="text-center">Description</th>
-                        <th className="text-center">Location</th>
-                        <th className="text-center">Severity</th>
-                        <th className="text-center">Reporter</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {disasterReports.slice(0, 5).map((report) => (
-                        <tr key={report.id}>
-                          <td className="text-center fw-bold">{report.type}</td>
-                          <td className="text-center">{report.description}</td>
-                          <td className="text-center">{report.address}</td>
-                          <td className="text-center">
-                            <span className={`badge ${getSeverityBadge(report.severity_level)}`}>
-                              {report.severity_level}
-                            </span>
-                          </td>
-                          <td className="text-center">{report.reported_by || "Unknown"}</td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-            </div>
-          </div> */}
 
           <div className="col-lg-12 mb-4 d-flex">
             <div className="card border-0 shadow-lg animate-slide-in-left w-100 h-100">
@@ -132,26 +92,46 @@ const Dashboard = ({ darkMode }) => {
                   <table className="table table-hover mb-0 text-center">
                     <thead className={darkMode ? "table-dark" : "table-light"}>
                       <tr>
-                        <th className="text-center ">Type</th>
-                        <th className="text-center">Description</th>
-                        <th className="text-center">Location</th>
-                        <th className="text-center">Severity</th>
-                        <th className="text-center">Reporter</th>
+                        <th className="text-center" style={{ wordWrap: "break-word", whiteSpace: "normal", maxWidth: "200px", margin: "auto" }}>
+                         
+                          Type</th>
+                          
+                        <th className="text-center" style={{ wordWrap: "break-word", whiteSpace: "normal", maxWidth: "200px", margin: "auto" }}>Description</th>
+                        <th className="text-center" style={{ wordWrap: "break-word", whiteSpace: "normal", maxWidth: "200px", margin: "auto" }}>Location</th>
+                        <th className="text-center" style={{ wordWrap: "break-word", whiteSpace: "normal", maxWidth: "200px", margin: "auto" }}>Severity</th>
+                        <th className="text-center" style={{ wordWrap: "break-word", whiteSpace: "normal", maxWidth: "200px", margin: "auto" }}>Reporter</th>
                       </tr>
                     </thead>
                   </table>
                   <div style={{ maxHeight: "200px", overflowY: "auto" }}>
-                    <table className="table table-hover mb-0 text-center">
+                    <table
+                      className="table table-hover mb-0 text-center"
+                      style={{ tableLayout: "fixed", width: "100%" }}
+                    >
                       <tbody>
                         {disasterReports.map((report) => (
                           <tr key={report.id}>
-                            <td className="text-center fw-bold">{report.type}</td>
-                            <td className="text-center">{report.description}</td>
-                            <td className="text-center">{report.address}</td>
+                            <td className="text-center fw-bold">
+                              <div style={{ wordWrap: "break-word", whiteSpace: "normal", maxWidth: "200px", margin: "auto" }}>
+                                {report.type}</div></td>
                             <td className="text-center">
+                              <div style={{ wordWrap: "break-word", whiteSpace: "normal", maxWidth: "200px", margin: "auto" }}>
+                                {report.description}
+                              </div>
+                            </td>
+                            <td className="text-center">
+                              <div style={{ wordWrap: "break-word", whiteSpace: "normal", maxWidth: "150px", margin: "auto" }}>
+                                {report.address}
+                              </div>
+                            </td>
+
+                            <td className="text-center">
+                              <div style={{ wordWrap: "break-word", whiteSpace: "normal", maxWidth: "200px", margin: "auto" }}>
+                              
                               <span className={`badge ${getSeverityBadge(report.severity_level)}`}>
                                 {report.severity_level}
                               </span>
+                              </div>
                             </td>
                             <td className="text-center">{report.reported_by || "Unknown"}</td>
                           </tr>
