@@ -1,5 +1,4 @@
-from django.urls import path,include
-from .views import VolunteerListView
+from django.urls import path
 from .views import (
     register_user,
     report_disaster,
@@ -9,6 +8,8 @@ from .views import (
     list_volunteers,
     list_disasters,
     submit_contact_message,
+    VolunteerListView,
+    predict_resources
 )
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
@@ -32,4 +33,5 @@ urlpatterns = [
     path('shelters/', list_shelters, name='list_shelters'),
     
     path('contact/', submit_contact_message, name='submit-contact'),
+    path('predict/' ,predict_resources,name = 'predict_resources'),
 ]

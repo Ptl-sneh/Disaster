@@ -2,9 +2,12 @@ from rest_framework import status,generics,viewsets
 from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
-from .serializers import UserRegisterSerializer,ShelterSerializer,VolunteerSerializer,DisasterSerializer,ContactMessageSerializer
-from .models import Disaster,Shelter,Volunteer,ContactMessage
+from .serializers import UserRegisterSerializer,ShelterSerializer,VolunteerSerializer,DisasterSerializer,ContactMessageSerializer,PredictedValuesSerializer
+from .models import Disaster,Shelter,Volunteer,ContactMessage,PredictedValues
 import requests
+import os 
+import joblib
+import numpy as np
 
 def geocode_address(address):
     key = 'ee92ecdd73ea4e38b10bd8553e5f0856'
@@ -66,17 +69,6 @@ def list_shelters(request):
 class ShelterViewSet(viewsets.ModelViewSet):
     queryset = Shelter.objects.all()
     serializer_class = ShelterSerializer
-
-# @api_view(['POST'])
-# @permission_classes([IsAuthenticated])
-# def register_volunteer(request):
-#     data = request.data.copy()
-#     data['user'] = request.user.id
-#     serializer = VolunteerSerializer(data=data)
-#     if serializer.is_valid():
-#         serializer.save()
-#         return Response(serializer.data, status=status.HTTP_201_CREATED)
-#     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST'])
@@ -143,3 +135,41 @@ class VolunteerListView(generics.ListAPIView):
     def get(self, request, *args, **kwargs):
         print("🔥 Volunteers fetched:", Volunteer.objects.all())
         return super().get(request, *args, **kwargs)
+
+
+def predict_resources(request):
+    mlpath = os.path.dirname(os.path.abspath(__file__))
+    Model_path = os.path.join(mlpath,'shelter_resource_model.pkl')
+    ML_model = joblib.load(Model_path)
+    
+    shelters = Shelter.objects.all()
+    results = []
+    
+    for shelter in shelters:
+        try:
+            current_occupancy = float(shelter.current_occupancy)
+            capacity = float(shelter.capacity)
+            input_data  = np.array([[current_occupancy,capacity]])
+            
+            prediction = ML_model.predict(input_data)[0]
+            food, water, kits, volunteers = prediction
+            
+            prediction_obj, created = PredictedValues.objects.update_or_create(
+                name=shelter,
+                defaults={
+                    'food_needed': str(int(round(food))),
+                    'water_required': str(int(round(water))),
+                    'medical_kits': str(int(round(kits))),
+                    'Volunteers_required': str(int(round(volunteers)))
+                }
+            )
+            results.append({
+                'shelter': shelter.name,
+                'food_needed': prediction_obj.food_needed,
+                'water_required': prediction_obj.water_required,
+                'medical_kits': prediction_obj.medical_kits,
+                'Volunteers_required': prediction_obj.Volunteers_required
+            })
+            print(results)
+        except Exception as e:
+            results.append({'shelter': shelter.name, 'error': str(e)})

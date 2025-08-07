@@ -90,4 +90,12 @@ class ContactMessage(models.Model):
     def __str__(self):
         return f"{self.name} - {self.subject} ({self.urgency})"
 
-
+class PredictedValues(models.Model):
+    name = models.ForeignKey(Shelter,on_delete=models.CASCADE)
+    food_needed = models.CharField(max_length=50)
+    water_required = models.CharField(max_length=50)
+    Volunteers_required = models.CharField(max_length=50)
+    medical_kits = models.CharField(max_length=50)
+    
+    def __str__(self):
+        return self.name

@@ -1,6 +1,6 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Disaster,Shelter,Volunteer,ContactMessage,ShelterImage
+from .models import Disaster,Shelter,Volunteer,ContactMessage,ShelterImage,PredictedValues
 from django.contrib import admin
 
 
@@ -36,11 +36,6 @@ class DisasterSerializer(serializers.ModelSerializer):
             return full_name
         return obj.reported_by.username
 
-        
-# class ShelterSerializer(serializers.ModelSerializer):
-#     class Meta:
-#         model = Shelter
-#         fields = '__all__'
 
 class ShelterImageSerializer(serializers.ModelSerializer):
     class Meta:
@@ -54,6 +49,12 @@ class ShelterSerializer(serializers.ModelSerializer):
     class Meta:
         model = Shelter
         fields = '__all__'  # includes all Shelter fields + images
+        
+
+class PredictedValuesSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = PredictedValues
+        fields = ['food_needed', 'water_required', 'Volunteers_required', 'medical_kits']
 
 
 class VolunteerSerializer(serializers.ModelSerializer):
