@@ -3,11 +3,14 @@ from rest_framework.permissions import AllowAny,IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.decorators import api_view,permission_classes
 from .serializers import UserRegisterSerializer,ShelterSerializer,VolunteerSerializer,DisasterSerializer,ContactMessageSerializer,PredictedValuesSerializer
+from django.conf import settings
+from django.http import JsonResponse
 from .models import Disaster,Shelter,Volunteer,ContactMessage,PredictedValues
 import requests
 import os 
 import joblib
 import numpy as np
+import pandas as pd
 
 def geocode_address(address):
     key = 'ee92ecdd73ea4e38b10bd8553e5f0856'
@@ -138,31 +141,46 @@ class VolunteerListView(generics.ListAPIView):
 
 
 def predict_resources(request):
-    mlpath = os.path.dirname(os.path.abspath(__file__))
-    Model_path = os.path.join(mlpath,'shelter_resource_model.pkl')
-    ML_model = joblib.load(Model_path)
+    model_path = os.path.join(settings.BASE_DIR, 'core', 'scripts', 'shelter_resource.pkl')
+    model = joblib.load(model_path)
     
     shelters = Shelter.objects.all()
     results = []
-    
     for shelter in shelters:
         try:
-            current_occupancy = float(shelter.current_occupancy)
-            capacity = float(shelter.capacity)
-            input_data  = np.array([[current_occupancy,capacity]])
-            
-            prediction = ML_model.predict(input_data)[0]
-            food, water, kits, volunteers = prediction
-            
+            current_occupancy = shelter.current_occupancy
+            capacity = shelter.capacity
+
+            # Derived features
+            occupancy_rate = current_occupancy / capacity
+            empty_beds = capacity - current_occupancy
+            is_full = int(current_occupancy == capacity)
+
+            input_data = pd.DataFrame([{
+                'current_occupancy': current_occupancy,
+                'capacity': capacity,
+                'occupancy_rate': occupancy_rate,
+                'empty_beds': empty_beds,
+                'is_full': is_full
+            }])
+
+            prediction = model.predict(input_data)[0]
+            food, water, kits_per_person, volunteers_per_person = prediction
+
+            medical_kits = int(kits_per_person * current_occupancy)
+            volunteers_required = int(volunteers_per_person * current_occupancy)
+
+            # Save prediction
             prediction_obj, created = PredictedValues.objects.update_or_create(
                 name=shelter,
                 defaults={
-                    'food_needed': str(int(round(food))),
-                    'water_required': str(int(round(water))),
-                    'medical_kits': str(int(round(kits))),
-                    'Volunteers_required': str(int(round(volunteers)))
+                    'food_needed': round(food),
+                    'water_required': round(water),
+                    'medical_kits': medical_kits,
+                    'Volunteers_required': volunteers_required
                 }
             )
+
             results.append({
                 'shelter': shelter.name,
                 'food_needed': prediction_obj.food_needed,
@@ -170,6 +188,8 @@ def predict_resources(request):
                 'medical_kits': prediction_obj.medical_kits,
                 'Volunteers_required': prediction_obj.Volunteers_required
             })
-            print(results)
+
         except Exception as e:
             results.append({'shelter': shelter.name, 'error': str(e)})
+
+    return JsonResponse({'predictions': results})

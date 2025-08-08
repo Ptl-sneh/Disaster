@@ -92,10 +92,10 @@ class ContactMessage(models.Model):
 
 class PredictedValues(models.Model):
     name = models.ForeignKey(Shelter,on_delete=models.CASCADE)
-    food_needed = models.CharField(max_length=50)
-    water_required = models.CharField(max_length=50)
-    Volunteers_required = models.CharField(max_length=50)
-    medical_kits = models.CharField(max_length=50)
+    food_needed = models.IntegerField()
+    water_required = models.IntegerField()
+    Volunteers_required = models.IntegerField()
+    medical_kits = models.IntegerField()
     
-    def __str__(self):
-        return self.name
+    # def __str__(self):
+    #     return f"{self.shelter.name}"
