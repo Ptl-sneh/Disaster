@@ -29,7 +29,7 @@ for i, col in enumerate(y.columns):
 
 # Save model
 model_dir = os.path.dirname(os.path.abspath(__file__))
-model_path = os.path.join(model_dir, 'shelter_resource.pkl')
+model_path = os.path.join(model_dir, 'shelter_resources.pkl')
 joblib.dump(model, model_path)
 
 print(f"✅ Model trained and saved at: {model_path}")
